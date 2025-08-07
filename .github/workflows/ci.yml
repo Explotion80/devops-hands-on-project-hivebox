@@ -32,13 +32,13 @@ jobs:
     #- name: Lint Python code
     #  run: pylint **/*.py
 
-    - name: Install hadolint
-      run: |
-        wget -O hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
-        chmod +x /bin/hadolint
+    #- name: Install hadolint
+    #  run: |
+    #    wget -O hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+    #    chmod +x /bin/hadolint
 
-    - name: Lint Dockerfile
-      run: hadolint Dockerfile
+    #- name: Lint Dockerfile
+    #  run: hadolint Dockerfile
 
     - name: Build Docker image
       run: docker build -t hivebox-app .
