@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [ phase-3-workflow ]
 
 jobs:
   build-test-lint:
