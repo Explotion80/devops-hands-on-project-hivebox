@@ -38,7 +38,7 @@ jobs:
         chmod +x /bin/hadolint
 
     - name: Lint Dockerfile
-      run: ./hadolint Dockerfile
+      run: hadolint Dockerfile
 
     - name: Build Docker image
       run: docker build -t hivebox-app .
