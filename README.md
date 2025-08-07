@@ -67,3 +67,19 @@ docker run --rm hivebox:0.0.1
 Expected output:
 
 HiveBox version: 0.0.1
+
+
+
+Best practices for Dockerfile and containers
+1. Use official, lightweight base images
+Avoid python:3.x – use python:3.x-slim instead.
+2. Use the requirements.txt file
+Separate the installation of dependencies from copying code.
+3. Set the working directory (WORKDIR)
+This makes it easier to navigate and maintain the project structure.
+4. Use a non-root user
+To increase container security.
+5. Use CMD, not ENTRYPOINT
+Because CMD is easier to override.
+6. Multi-stage build (optional)
+For large applications, you can add a build stage.
