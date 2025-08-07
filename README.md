@@ -52,4 +52,19 @@ Here is a pre-start checklist:
 
 ## Implementation
 
-** ADD YOUR IMPLEMENTATION DOCUMENTATION HERE **
+## Testing
+
+### Run locally with Python
+
+```bash
+python main.py
+
+Run with Docker
+
+docker build -t hivebox:0.0.1 .
+docker run --rm hivebox:0.0.1
+
+
+Expected output:
+
+HiveBox version: 0.0.1
