@@ -54,16 +54,15 @@ Here is a pre-start checklist:
 
 ## Testing
 
-### Run locally with Python
-
 ```bash
 python main.py
+```
 
 Run with Docker
-
+```bash
 docker build -t hivebox:0.0.1 .
 docker run --rm hivebox:0.0.1
-
+```
 
 Expected output:
 
