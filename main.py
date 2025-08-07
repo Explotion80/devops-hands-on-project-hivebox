@@ -1,43 +1,70 @@
-import datetime
-from fastapi import FastAPI
-import httpx
-
+from flask import Flask, jsonify
+import requests
 from datetime import datetime, timedelta
 
-app = FastAPI()
-VERSION = "0.0.2"
+app = Flask(__name__)
+VERSION = "0.0.1"
+
+# Lista ID senseBoxów, które Cię interesują
 SENSEBOX_IDS = [
-    "5e86143a6feb97001c1c9b8b",
-    "62041d12bbfa4b001dff1214",
-    "5e861b696feb97001c1f2fff"
+    "5eba5fbad46fb8001b799786",
+    "5c21ff8f919bf8001adf2488",
+    "5ade1acf223bd80019a1011c"
 ]
 
-@app.get("/")
-def root():
-    return {
-        "message": "HiveBox API – dostępne endpointy: /version, /temperature"
-    }
-
-@app.get("/version")
+@app.route("/version")
 def get_version():
-    return {"version": VERSION}
+    return jsonify({"version": VERSION})
 
-@app.get("/temperature")
+@app.route("/temperature-debug")
+def temperature_debug():
+    try:
+        result = []
+        for sensebox_id in SENSEBOX_IDS:
+            url = f"https://api.opensensemap.org/boxes/{sensebox_id}"
+            response = requests.get(url)
+            response.raise_for_status()
+            box = response.json()
+
+            sensors_data = []
+            for sensor in box.get("sensors", []):
+                if sensor.get("title", "").lower() == "temperatur":
+                    measurement = sensor.get("lastMeasurement")
+                    sensors_data.append({
+                        "title": sensor.get("title"),
+                        "lastMeasurement": measurement
+                    })
+
+            result.append({
+                "senseBoxId": sensebox_id,
+                "sensors": sensors_data
+            })
+
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+@app.route("/temperatur")
 def get_temperature():
+    """
+    Zwraca średnią temperaturę z ostatniej godziny z wszystkich senseBoxów.
+    """
     try:
         now = datetime.utcnow()
         one_hour_ago = now - timedelta(hours=1)
-
         temperatures = []
 
-        for box_id in SENSEBOX_IDS:
-            url = f"https://api.opensensemap.org/boxes/{box_id}"
-            response = httpx.get(url)
+        for sensebox_id in SENSEBOX_IDS:
+            url = f"https://api.opensensemap.org/boxes/{sensebox_id}"
+            response = requests.get(url)
             response.raise_for_status()
-            data = response.json()
+            box = response.json()
 
-            for sensor in data.get("sensors", []):
-                if sensor.get("title", "").lower() == "temperature":
+            for sensor in box.get("sensors", []):
+                if sensor.get("title", "").lower() == "temperatur":
                     measurement = sensor.get("lastMeasurement")
                     if not measurement:
                         continue
@@ -56,10 +83,18 @@ def get_temperature():
                             continue
 
         if not temperatures:
-            return {"message": "No recent temperature data found."}
+            return jsonify({"message": "No recent temperature data found."})
 
         avg_temp = sum(temperatures) / len(temperatures)
-        return {"average_temperature": round(avg_temp, 2)}
+        return jsonify({"average_temperature": round(avg_temp, 2)})
 
     except Exception as e:
-        return {"error": str(e)}
+        return jsonify({"error": str(e)}), 500
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+"""
+Moduł odpowiedzialny za endpoint /version.
+"""
